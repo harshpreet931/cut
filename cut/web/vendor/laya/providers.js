@@ -84,11 +84,17 @@ function isOomError(e) {
     return m.includes("memory") || m.includes("cuda") || m.includes("out of memory") || m.includes("oom");
 }
 // Patched for cut: the stock version always went to the network (the cache was only an offline
-// fallback), so every visit re-downloaded the model. This one is cache-first and reports progress.
+// fallback), so every visit re-downloaded the model. This one is cache-first, reports progress, and
+// downloads big files as parallel HTTP Range chunks: a single 500 MB stream from the Hugging Face CDN
+// can drop partway (ERR_HTTP2_PROTOCOL_ERROR), and one connection there runs at a few MB/s.
 let onFetchProgress = null;
 export function setFetchProgress(fn) {
     onFetchProgress = fn;
 }
+const CHUNK = 16 << 20;
+const PARALLEL = 6;
+const TRIES = 5;
+const CHUNK_TIMEOUT_MS = 60000; // a stalled connection is retried rather than waited on
 async function fetchArrayBuffer(url) {
     let cache = null;
     try {
@@ -102,40 +108,84 @@ async function fetchArrayBuffer(url) {
             if (hit) return await hit.arrayBuffer();
         } catch  {}
     }
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`fetch failed for ${url}: ${res.status}`);
-    const buf = await readWithProgress(res, url);
+    const buf = await download(url);
     if (cache) {
         try {
-            await cache.put(url, new Response(buf, {
-                headers: {
-                    "content-type": res.headers.get("content-type") ?? "application/octet-stream"
-                }
-            }));
+            await cache.put(url, new Response(buf));
         } catch  {}
     }
     return buf;
 }
-async function readWithProgress(res, url) {
-    const total = Number(res.headers.get("content-length")) || 0;
+async function download(url) {
+    // The first chunk doubles as the probe: a 206 tells us the total size from Content-Range.
+    const first = await withRetries(()=>fetch(url, {
+            headers: {
+                Range: `bytes=0-${CHUNK - 1}`
+            }
+        }));
+    if (!first.ok) throw new Error(`fetch failed for ${url}: ${first.status}`);
+    const total = Number(first.headers.get("content-range")?.split("/")[1]);
+    if (first.status !== 206 || !total) return await readAll(first, url, Number(first.headers.get("content-length")) || 0);
+    const out = new Uint8Array(total);
+    let got = 0;
+    const report = (n)=>{
+        got += n;
+        onFetchProgress?.(url, got, total);
+    };
+    out.set(new Uint8Array(await first.arrayBuffer()), 0);
+    report(Math.min(CHUNK, total));
+    const ranges = [];
+    for(let start = CHUNK; start < total; start += CHUNK)ranges.push([
+        start,
+        Math.min(total, start + CHUNK) - 1
+    ]);
+    let next = 0;
+    const worker = async ()=>{
+        while(next < ranges.length){
+            const [a, b] = ranges[next++];
+            const piece = await withRetries(async ()=>{
+                const res = await fetch(url, {
+                    headers: {
+                        Range: `bytes=${a}-${b}`
+                    },
+                    signal: AbortSignal.timeout(CHUNK_TIMEOUT_MS)
+                });
+                if (res.status !== 206) throw new Error(`fetch failed for ${url}: ${res.status}`);
+                const body = new Uint8Array(await res.arrayBuffer());
+                if (body.length !== b - a + 1) throw new Error(`short read for ${url}`);
+                return body;
+            });
+            out.set(piece, a);
+            report(piece.length);
+        }
+    };
+    await Promise.all(Array.from({
+        length: PARALLEL
+    }, worker));
+    return out.buffer;
+}
+async function withRetries(fn) {
+    for(let attempt = 1;; attempt++){
+        try {
+            return await fn();
+        } catch (e) {
+            if (attempt >= TRIES) throw e;
+            await new Promise((r)=>setTimeout(r, 400 * 2 ** attempt));
+        }
+    }
+}
+async function readAll(res, url, total) {
     if (!res.body || !onFetchProgress) return await res.arrayBuffer();
     const reader = res.body.getReader();
-    // Write straight into one buffer when the size is known, so a 500 MB file isn't held twice.
-    let out = total ? new Uint8Array(total) : null;
     const chunks = [];
     let got = 0;
     for(;;){
         const { done, value } = await reader.read();
         if (done) break;
-        if (out && got + value.length <= total) out.set(value, got);
-        else {
-            if (out) chunks.push(out.subarray(0, got)), out = null;
-            chunks.push(value);
-        }
+        chunks.push(value);
         got += value.length;
         onFetchProgress(url, got, total);
     }
-    if (out) return got === total ? out.buffer : out.slice(0, got).buffer;
     const joined = new Uint8Array(got);
     let o = 0;
     for (const c of chunks){

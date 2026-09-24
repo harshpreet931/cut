@@ -8,8 +8,9 @@ Changes from upstream:
 
 - Converted from TypeScript to JavaScript by stripping types with Node's `module.stripTypeScriptTypes`.
 - Only the modules the browser path uses are kept: `agent`, `common`, `hooks`, `providers`, `tokenizer`.
-- `providers.js`: `fetchArrayBuffer` is cache-first (upstream always went to the network) and reports
-  download progress through a new `setFetchProgress` export.
+- `providers.js`: `fetchArrayBuffer` is cache-first (upstream always went to the network), downloads
+  large files as parallel HTTP Range chunks with retries (a single 500 MB stream from the Hugging Face
+  CDN can drop partway), and reports progress through a new `setFetchProgress` export.
 - `providers.js`: in the browser the head runs on WebGPU as well (upstream: WASM only), and the encoder's
   output tensor is handed to the head directly instead of being converted to nested arrays and back
   (`feedHead` accepts a tensor). About 3x faster per post.
