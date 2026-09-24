@@ -134,6 +134,16 @@ h2 {
   border-top: 1px solid #e7e5df;
   text-wrap: pretty;
 }
+.link {
+  font: 12px "Courier Prime", monospace;
+  color: var(--pencil);
+  background: none;
+  border: 0;
+  padding: 6px 0 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 .stats {
   margin: 12px 0 0;
   color: var(--ink-faint);

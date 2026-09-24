@@ -9,7 +9,7 @@
       text: ".update-components-text, .feed-shared-inline-show-more-text, .feed-shared-text",
       // LinkedIn renames its classes; post text still comes in runs marked with a writing direction.
       fallback: true,
-      exclude: "header, nav, aside, form, [role='dialog'], [contenteditable], [class*='comment'], [data-view-name*='comment'], [class*='msg-'], [class*='messaging']",
+      exclude: "header, nav, aside, form, [role='dialog'], [contenteditable], [class*='comment'], [data-view-name*='comment'], [data-testid*='comment'], [class*='msg-'], [class*='messaging']",
     },
     {
       name: "X",
@@ -56,16 +56,30 @@
     return oneSentencePerLine(raw);
   }
 
-  // Post text boxes: the known class names first, then (on LinkedIn) any long run of text with a
-  // writing direction that isn't page chrome or a comment. Only the outermost box of each post counts.
+  // Anything that makes a box more than text. Climbing from a run of text stops below these.
+  const NOT_TEXT = "img, video, svg, picture, iframe, input, textarea, select, button, h1, h2, h3, h4, h5, h6, header, nav, footer, aside, form, ul, ol, table, article, section, figure";
+
+  // Post text boxes: the known class names first, then (on LinkedIn, whose markup keeps changing) the
+  // outermost box around each long run of text that holds nothing but text: paragraphs, spans, links
+  // and line breaks. That needs no class names or attributes at all.
   function textBoxes() {
     const found = new Set(document.querySelectorAll(site.text));
     if (site.fallback) {
-      for (const el of document.querySelectorAll("[dir='ltr'], [dir='auto'], [dir='rtl']")) {
-        if (el.closest("cut-post") || (site.exclude && el.closest(site.exclude))) continue;
-        if (el.querySelector("div, p, ul, ol, li, button, section, article, h1, h2, h3, input, textarea, video")) continue;
-        if ((el.textContent || "").length < 120) continue;
-        found.add(el);
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      const parents = new Set();
+      for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+        if (n.data.length < 40) continue;
+        const p = n.parentElement;
+        if (!p || parents.has(p)) continue;
+        parents.add(p);
+        if (p.closest("script, style, noscript, cut-post, [contenteditable], [role='dialog']")) continue;
+        if (site.exclude && p.closest(site.exclude)) continue;
+        if (p.closest(NOT_TEXT)) continue;
+        let box = p;
+        while (box.parentElement && box.parentElement !== document.body && !box.parentElement.matches(NOT_TEXT) && !box.parentElement.querySelector(NOT_TEXT)) {
+          box = box.parentElement;
+        }
+        found.add(box);
       }
     }
     return [...found].filter((el) => {
@@ -407,8 +421,34 @@
     }
   }
 
+  // For "Copy page details" in the popup: where the page's longest runs of text sit, as tags, classes
+  // and attributes only. No post text is included.
+  function outline() {
+    const runs = [];
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+      if (n.data.trim().length > 60 && !n.parentElement?.closest("script, style, cut-post")) runs.push(n);
+    }
+    runs.sort((a, b) => b.data.length - a.data.length);
+    const describe = (el) =>
+      el.tagName.toLowerCase() +
+      (typeof el.className === "string" && el.className.trim() ? "." + el.className.trim().split(/\s+/).slice(0, 4).join(".") : "") +
+      [...el.attributes]
+        .filter((a) => a.name.startsWith("data-") || ["dir", "role", "aria-label", "lang"].includes(a.name))
+        .map((a) => `[${a.name}="${a.value.slice(0, 40)}"]`)
+        .join("");
+    const lines = [`cut. on ${site.name}: ${location.pathname}; ${[...states.values()].filter((s) => !s.skip).length} long posts found`];
+    for (const n of runs.slice(0, 4)) {
+      const chain = [];
+      for (let el = n.parentElement; el && el !== document.body && chain.length < 14; el = el.parentElement) chain.push(describe(el));
+      lines.push(`text run of ${n.data.length} chars in:\n  ` + chain.join("\n  < "));
+    }
+    return lines.join("\n\n");
+  }
+
   // What the popup shows under "This page".
   chrome.runtime.onMessage.addListener((msg, _sender, send) => {
+    if (msg.type === "tab-outline") return void send(outline());
     if (msg.type !== "tab-status") return;
     const all = [...states.values()];
     send({

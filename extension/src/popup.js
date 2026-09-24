@@ -63,6 +63,12 @@ if (!document.body.classList.contains("page")) {
     pageEl.textContent = s.long
       ? `This page: ${s.long} long ${s.long === 1 ? "post" : "posts"} found on ${s.site}, ${s.cut} cut${s.reading ? `, ${s.reading} being read` : ""}.`
       : `This page: cut. is running on ${s.site} but hasn’t found a long post yet. Scroll the feed; posts under 30 words are left alone.`;
+    const details = $("#details");
+    details.hidden = false;
+    details.addEventListener("click", async () => {
+      await navigator.clipboard.writeText(await chrome.tabs.sendMessage(tab.id, { type: "tab-outline" }));
+      details.textContent = "Copied. It has the page’s structure, not its text.";
+    });
   } catch {
     pageEl.textContent = "This page: cut. isn’t running here. It works on linkedin.com and x.com; if you’re on one of those, reload the tab.";
   }
