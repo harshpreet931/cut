@@ -1,0 +1,44 @@
+[
+  {
+    "id": "humble",
+    "title": "The humble announcement",
+    "point": [4],
+    "text": "I'm humbled and honored to share some news.\nThree years ago, I was sleeping on a friend's couch with $40 in my bank account.\nEveryone told me to quit.\nI didn't.\nToday, I'm starting a new role as Head of Growth at Northwind.\nBut this isn't about me.\nIt's about every single person who believed in me when I didn't believe in myself.\nAgree?\nWhat's one lesson that changed your career? 👇"
+  },
+  {
+    "id": "kid",
+    "title": "My kid taught me sales",
+    "point": [5, 6],
+    "text": "Yesterday, my 6-year-old taught me more about B2B sales than any MBA ever could.\nShe wanted ice cream.\nI said no.\nShe asked again, but this time she offered to clean her room first.\nThat's when it hit me.\nLead with value, not the ask.\nWe rolled this into our outbound playbook and reply rates went from 2% to 9%.\nLet that sink in.\n♻️ Repost if this resonated."
+  },
+  {
+    "id": "meetings",
+    "title": "Unpopular opinion",
+    "point": [2, 4],
+    "text": "Unpopular opinion:\nMeetings are not work.\nI cancelled every recurring meeting on my team for 30 days.\nThe result?\nWe shipped 2 features ahead of schedule and nobody missed the standup.\nHere's what I learned 🧵"
+  },
+  {
+    "id": "rejected",
+    "title": "47 rejections",
+    "point": [4],
+    "text": "I got rejected 47 times.\n47.\nMost people would have given up.\nBut I kept showing up, every single day.\nLast week, I accepted an offer to join Contoso as a senior designer.\nRejection is just redirection.\nIf you're in the trenches right now, keep going.\nYour yes is coming. 💪\n#OpenToWork #Grateful #NeverGiveUp"
+  },
+  {
+    "id": "laidoff",
+    "title": "Laid off on a Tuesday",
+    "point": [6],
+    "text": "I was laid off on a Tuesday.\nNo warning.\nNo goodbye.\nJust a 15-minute call and a locked laptop.\nI sat in my car for an hour.\nThen I opened a notebook and wrote down everything I'd learned.\nToday I'm launching Tallyleaf, a bookkeeping tool for freelancers.\nSometimes the end is actually the beginning.\nWho else has turned a setback into a comeback? 👇"
+  },
+  {
+    "id": "leadership",
+    "title": "Thought leadership",
+    "point": [5, 6],
+    "text": "In today's fast-paced digital landscape, leadership is more important than ever.\nIt's not just about managing people.\nIt's about inspiring them.\nHere's the thing: great leaders don't have all the answers.\nThey ask better questions.\nAt our offsite, we replaced status updates with one question: what's blocking you?\nBlockers surfaced three weeks earlier on average.\nLet that sink in.\nWhat's your take? Drop it in the comments. 🚀"
+  },
+  {
+    "id": "email",
+    "title": "The circle-back email",
+    "point": [4],
+    "text": "Hi team,\nI hope this email finds you well.\nI just wanted to quickly circle back on the Q3 numbers.\nPer my last email, the deadline is Friday.\nSorry to bother you, but could you please send your forecasts by Thursday?\nThanks in advance!"
+  }
+]

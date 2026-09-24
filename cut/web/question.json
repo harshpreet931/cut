@@ -1,0 +1,11 @@
+{
+  "type": "choice",
+  "instructions": "What job does the SENTENCE do in the post?",
+  "criteria": {
+    "news": "the concrete announcement, request, fact or result the post exists to share",
+    "story": "backstory or anecdote leading up to the point",
+    "bait": "asks readers to like, comment, repost or agree",
+    "brag": "self-congratulation dressed up as humility or gratitude",
+    "filler": "cliche, dramatic pause or line that adds no information"
+  }
+}

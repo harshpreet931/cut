@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>cut.</title>
+  <meta name="description" content="An editor that can’t write. It can only cut.">
+  <meta name="theme-color" content="#1e5641">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='3' fill='%231e5641'/%3E%3Cpath d='M6 17 Q16 15 24 16 C30 16 30 8 26 8 C22 8 24 13 29 11' fill='none' stroke='%23fdfdfb' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Reenie+Beanie&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <!-- Only used when there's no local server: Laya then runs in the page with ONNX Runtime Web. -->
+  <script type="importmap">{"imports": {"onnxruntime-web": "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.30.0/dist/ort.webgpu.bundle.min.mjs"}}</script>
+</head>
+<body data-mode="edit">
+  <div class="ruler" aria-hidden="true"></div>
+  <div class="wrap">
+    <header class="top">
+      <h1 class="wordmark" translate="no">cut.</h1>
+      <p class="tagline">An editor that can’t write. It can only cut.</p>
+    </header>
+
+    <div class="bar">
+      <label class="picker">
+        <span class="visually-hidden">Load a sample post</span>
+        <select id="samples"><option value="">Try a sample post</option></select>
+      </label>
+      <button id="cut" class="primary" disabled aria-keyshortcuts="Meta+Enter Control+Enter">Cut it <kbd class="kbd">⌘↵</kbd></button>
+      <button id="load" class="quiet" hidden>Run Laya in your browser (534&nbsp;MB)</button>
+      <button id="copy" class="quiet" hidden>Copy</button>
+      <button id="share" class="quiet" hidden>Post on X</button>
+      <button id="back" class="quiet" hidden>Back to the draft</button>
+    </div>
+
+    <main class="sheet">
+      <div class="sheet-head">
+        <p id="count" class="count"></p>
+        <div id="grade" class="grade" aria-live="polite"></div>
+      </div>
+      <div class="page" id="page">
+        <div class="col">
+          <div class="mirror" id="mirror" aria-hidden="true"></div>
+          <textarea id="input" spellcheck="false" autocomplete="off" aria-label="Your post"
+            placeholder="Paste a post, an email, anything you wrote…"></textarea>
+        </div>
+        <div class="margin" aria-hidden="true"></div>
+        <svg id="ink" class="ink" aria-hidden="true"></svg>
+        <div id="overlay" class="overlay"></div>
+      </div>
+      <p id="colophon" class="colophon" hidden>Every word left was already yours.</p>
+    </main>
+
+    <footer class="foot">
+      <p id="status" class="status" role="status">Connecting to Laya…</p>
+      <details class="work">
+        <summary>The model’s work</summary>
+        <pre id="log" class="log"></pre>
+      </details>
+      <p class="credit">
+        <a href="https://huggingface.co/convaiinnovations/laya" translate="no">Laya</a>, an open 421M-parameter model, reads each line and says what job it does.
+        Code does the cutting, so nothing is generated. Made by <a href="https://harshpreet.com">Harshpreet Singh</a>.
+      </p>
+    </footer>
+  </div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

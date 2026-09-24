@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+.vercel/
+# reference clip used while designing; not ours to publish
+*.mp4
