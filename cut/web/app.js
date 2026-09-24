@@ -1,4 +1,4 @@
-import { makePlan, guessProbs } from "./plan.js";
+import { makePlan, guessProbs, oneSentencePerLine } from "./plan.js";
 import * as pen from "./pencil.js";
 import * as browserLaya from "./browser-laya.js";
 
@@ -531,17 +531,6 @@ function backToDraft() {
 }
 
 // ---------- input ----------
-
-// Pasted paragraphs become one sentence per line, so each sentence can be judged and cut on its own.
-function oneSentencePerLine(text) {
-  return text
-    .replace(/\r\n?/g, "\n")
-    .split("\n")
-    .map((l) => l.replace(/(?<=[.!?…]["”’)]?)\s+(?=["“‘(]?[\p{Lu}\d])/gu, "\n"))
-    .join("\n")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
-}
 
 input.addEventListener("paste", (e) => {
   const text = e.clipboardData?.getData("text/plain");

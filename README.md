@@ -13,6 +13,12 @@ anywhere, phones included. For your own text, Laya runs inside the page with Web
 download that your browser keeps for next time. Nothing you type is sent anywhere. It needs a browser with
 WebGPU (recent Chrome or Edge on a computer); without it, your own text gets a rough guess from plain rules.
 
+## Chrome extension
+
+Cuts long posts on LinkedIn and X live as you scroll, on your own computer. See
+[`extension/README.md`](extension/README.md): `python3 extension/build.py`, then load `extension/dist`
+unpacked at `chrome://extensions`.
+
 ## Run it locally
 
 Faster, and works in any browser. You need [uv](https://docs.astral.sh/uv/).

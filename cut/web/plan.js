@@ -159,3 +159,14 @@ export function makePlan(lines, probs, stet = new Map()) {
   const fluff = before ? 1 - after / before : 0;
   return { items, before, after, fluff, ready, grade: ready ? grade(fluff) : null };
 }
+
+// Pasted paragraphs become one sentence per line, so each sentence can be judged and cut on its own.
+export function oneSentencePerLine(text) {
+  return text
+    .replace(/\r\n?/g, "\n")
+    .split("\n")
+    .map((l) => l.replace(/(?<=[.!?…]["”’)]?)\s+(?=["“‘(]?[\p{Lu}\d])/gu, "\n"))
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}

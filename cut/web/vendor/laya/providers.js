@@ -419,7 +419,9 @@ export async function createNodeProvider(modelDir, opts) {
     };
 }
 export async function createWebProvider(modelUrl, opts) {
-    const spec = "onnxruntime-" + "web";
+    // Patched for cut: a Chrome extension can't load code from a CDN or use an import map, so it sets
+    // LAYA_ORT_URL to a copy of ONNX Runtime Web bundled with the extension.
+    const spec = globalThis.LAYA_ORT_URL ?? "onnxruntime-" + "web";
     const ort = await import(spec);
     applyNumThreads(ort, opts?.numThreads);
     const base = modelUrl.replace(/\/+$/, "");

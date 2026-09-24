@@ -1,0 +1,151 @@
+@font-face {
+  font-family: "Courier Prime";
+  font-weight: 400;
+  src: url("fonts/CourierPrime-Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Courier Prime";
+  font-weight: 700;
+  src: url("fonts/CourierPrime-Bold.woff2") format("woff2");
+}
+:root {
+  --mat: #1e5641;
+  --mat-print: #d3e5d7;
+  --paper: #fdfdfb;
+  --ink: #22211f;
+  --ink-faint: #75726b;
+  --pencil: #2350b8;
+  --focus: #f2cf5b;
+  color-scheme: light;
+  -webkit-font-smoothing: antialiased;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  width: 360px;
+  font: 13px/1.5 "Courier Prime", ui-monospace, monospace;
+  color: var(--ink);
+  background-color: var(--mat);
+  background-image: linear-gradient(rgba(214, 236, 220, 0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(214, 236, 220, 0.12) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+body.page {
+  width: auto;
+  min-height: 100vh;
+  display: grid;
+  place-content: center;
+}
+body.page .sheet,
+body.page .top,
+body.page .foot {
+  width: 460px;
+}
+.top {
+  padding: 16px 16px 12px;
+  color: var(--paper);
+}
+.wordmark {
+  margin: 0;
+  font-size: 30px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.tagline {
+  margin: 6px 0 0;
+  color: var(--mat-print);
+}
+.sheet {
+  margin: 0 12px;
+  padding: 14px 16px 16px;
+  background: var(--paper);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2), 0 14px 30px -16px rgba(0, 0, 0, 0.6);
+}
+.welcome {
+  margin: 0 0 14px;
+  text-wrap: pretty;
+}
+.modes {
+  margin: 0 0 14px;
+  padding: 0;
+  border: 0;
+  display: grid;
+  gap: 6px;
+}
+legend,
+h2 {
+  margin: 0 0 6px;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-faint);
+}
+.modes label {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  cursor: pointer;
+  padding: 4px 0;
+}
+.modes input {
+  accent-color: var(--pencil);
+  margin: 0;
+  translate: 0 2px;
+}
+.model {
+  border-top: 1px solid #e7e5df;
+  padding-top: 12px;
+}
+.status {
+  margin: 0 0 8px;
+  text-wrap: pretty;
+}
+.bar {
+  height: 6px;
+  background: #e7e5df;
+  margin: 0 0 10px;
+}
+.fill {
+  height: 100%;
+  width: 0;
+  background: var(--pencil);
+  transition: width 0.2s;
+}
+.primary {
+  font: 700 13px "Courier Prime", monospace;
+  color: var(--paper);
+  background: var(--pencil);
+  border: 0;
+  padding: 9px 14px;
+  cursor: pointer;
+  transition: scale 0.12s;
+}
+.primary:active {
+  scale: 0.96;
+}
+.primary:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.stats {
+  margin: 12px 0 0;
+  color: var(--ink-faint);
+  font-variant-numeric: tabular-nums;
+}
+.stats:empty {
+  display: none;
+}
+.foot {
+  display: flex;
+  gap: 16px;
+  padding: 10px 16px 14px;
+}
+.foot a {
+  color: var(--mat-print);
+  text-underline-offset: 3px;
+}
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}

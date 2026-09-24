@@ -6,3 +6,7 @@ __pycache__/
 # reference clip used while designing; not ours to publish
 *.mp4
 browser-model/
+video/
+extension/dist/
+extension/.cache/
+extension/*.zip

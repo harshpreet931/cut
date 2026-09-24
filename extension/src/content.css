@@ -1,0 +1,137 @@
+/* Lives inside each post's shadow root, so none of it leaks into the site or the other way round. */
+:host {
+  display: block;
+  font: inherit;
+  color: inherit;
+  --pencil: #2350b8;
+}
+:host(.dark) {
+  --pencil: #8fb0ff;
+}
+.cut {
+  position: relative;
+}
+.row {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  overflow: hidden;
+  transition: opacity 0.2s cubic-bezier(0.55, 0, 1, 0.45);
+}
+.row.empty {
+  height: 0.7em;
+}
+.note {
+  font-family: "cut-hand", "Bradley Hand", cursive;
+  font-size: 1.5em;
+  line-height: 0.8;
+  color: var(--pencil);
+  opacity: var(--o, 1);
+  margin-left: 0.45em;
+  white-space: nowrap;
+}
+.ink {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  transition: opacity 0.2s cubic-bezier(0.55, 0, 1, 0.45);
+}
+.mark {
+  fill: none;
+  stroke: var(--pencil);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.mark.soft {
+  stroke-width: 1.4;
+}
+.draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw 0.28s cubic-bezier(0.35, 0.1, 0.3, 1) forwards;
+}
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.write {
+  animation: write 0.35s steps(10, end) both;
+}
+@keyframes write {
+  from {
+    clip-path: inset(-40% 100% -40% 0);
+  }
+  to {
+    clip-path: inset(-40% -5% -40% 0);
+  }
+}
+.gone {
+  opacity: 0;
+}
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--pencil);
+}
+.brand {
+  font-weight: 700;
+}
+.msg s {
+  text-decoration-thickness: 1.5px;
+}
+.grade {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 30px;
+}
+.grade .ring {
+  position: absolute;
+  inset: 0;
+  width: 28px;
+  height: 30px;
+  overflow: visible;
+}
+.hand {
+  font-family: "cut-hand", "Bradley Hand", cursive;
+  font-size: 22px;
+  line-height: 1;
+}
+button {
+  font: inherit;
+  font-size: 13px;
+  color: var(--pencil);
+  background: none;
+  border: 0;
+  padding: 6px 2px;
+  min-height: 32px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+button:hover {
+  text-decoration-thickness: 2px;
+}
+button:focus-visible {
+  outline: 2px solid var(--pencil);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .draw,
+  .write {
+    animation: none;
+    stroke-dashoffset: 0;
+    clip-path: none;
+  }
+}

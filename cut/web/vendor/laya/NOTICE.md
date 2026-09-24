@@ -14,3 +14,5 @@ Changes from upstream:
 - `providers.js`: in the browser the head runs on WebGPU as well (upstream: WASM only), and the encoder's
   output tensor is handed to the head directly instead of being converted to nested arrays and back
   (`feedHead` accepts a tensor). About 3x faster per post.
+- `providers.js`: the ONNX Runtime Web module can be overridden with `globalThis.LAYA_ORT_URL` (used by the
+  Chrome extension, which bundles its own copy).

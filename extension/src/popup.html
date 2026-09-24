@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>cut.</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header class="top">
+    <h1 class="wordmark">cut.</h1>
+    <p class="tagline">An editor that can’t write. It can only cut.</p>
+  </header>
+  <main class="sheet">
+    <p id="welcome" class="welcome" hidden>
+      Scroll LinkedIn or X and long posts get read line by line. The fluff is struck out and only the point stays.
+      Nothing is rewritten, and nothing leaves your computer.
+    </p>
+
+    <fieldset class="modes">
+      <legend>On LinkedIn and X</legend>
+      <label><input type="radio" name="mode" value="cut"> <span><b>Cut the feed.</b> Posts shrink to their point as you scroll.</span></label>
+      <label><input type="radio" name="mode" value="mark"> <span><b>Mark it.</b> Pencil notes on every line; you choose what to cut.</span></label>
+      <label><input type="radio" name="mode" value="off"> <span><b>Off.</b></span></label>
+    </fieldset>
+
+    <section class="model">
+      <h2>The model</h2>
+      <p id="status" class="status" role="status">Checking…</p>
+      <div id="bar" class="bar" hidden><div id="fill" class="fill"></div></div>
+      <button id="download" class="primary" hidden>Download Laya (534&nbsp;MB)</button>
+    </section>
+
+    <p id="stats" class="stats"></p>
+  </main>
+  <footer class="foot">
+    <a href="https://cut-neon.vercel.app" target="_blank" rel="noopener">cut-neon.vercel.app</a>
+    <a href="https://github.com/harshpreet931/cut" target="_blank" rel="noopener">Source</a>
+  </footer>
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

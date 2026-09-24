@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "cut. for LinkedIn and X",
+  "short_name": "cut.",
+  "version": "0.1.0",
+  "description": "An editor that can't write, only cut. Strikes the fluff from long posts as you scroll. Runs on your computer.",
+  "icons": { "16": "icons/16.png", "32": "icons/32.png", "48": "icons/48.png", "128": "icons/128.png" },
+  "action": { "default_popup": "popup.html", "default_icon": { "16": "icons/16.png", "32": "icons/32.png" } },
+  "background": { "service_worker": "background.js", "type": "module" },
+  "permissions": ["offscreen", "storage", "alarms"],
+  "content_scripts": [
+    {
+      "matches": ["https://www.linkedin.com/*", "https://x.com/*", "https://twitter.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["lib/plan.js", "lib/pencil.js", "content.css", "fonts/*"],
+      "matches": ["https://www.linkedin.com/*", "https://x.com/*", "https://twitter.com/*"]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  }
+}
