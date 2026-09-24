@@ -1,6 +1,6 @@
 # cut.
 
-An editor that can't write. It can only cut.
+An editor that can't write. It can only cut. **Try it: [cut-neon.vercel.app](https://cut-neon.vercel.app)**
 
 Paste a post. A blue pencil marks what every line is doing (backstory, bait, humblebrag, filler), finds the one line that matters, and cuts the rest. Every word left was already yours.
 

@@ -351,7 +351,8 @@ async function startBrowser() {
     state.browser = "error";
     loadBtn.disabled = false;
     loadBtn.textContent = "Try loading Laya again";
-    setStatus(`Laya couldn’t start in this browser (${e.message}). Your own text gets a rough guess.`);
+    const why = /Incompatible model|fetch failed/.test(e.message) ? "its files couldn’t be downloaded" : e.message;
+    setStatus(`Laya couldn’t start in this browser (${why}). Your own text gets a rough guess for now.`);
   }
 }
 

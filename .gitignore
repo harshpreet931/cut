@@ -5,3 +5,4 @@ __pycache__/
 .vercel/
 # reference clip used while designing; not ours to publish
 *.mp4
+browser-model/
