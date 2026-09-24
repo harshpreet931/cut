@@ -445,13 +445,15 @@ export async function createWebProvider(modelUrl, opts) {
             executionProviders: [
                 "webgpu",
                 "wasm"
-            ]
+            ],
+            logSeverityLevel: 3
         });
     } catch (e) {
         enc = await ort.InferenceSession.create(new Uint8Array(encBuf), {
             executionProviders: [
                 "wasm"
-            ]
+            ],
+            logSeverityLevel: 3
         });
     }
     // Patched for cut: the head runs on WebGPU as well (upstream: WASM only), and the encoder's output
@@ -462,13 +464,15 @@ export async function createWebProvider(modelUrl, opts) {
             executionProviders: [
                 "webgpu",
                 "wasm"
-            ]
+            ],
+            logSeverityLevel: 3
         });
     } catch  {
         head = await ort.InferenceSession.create(new Uint8Array(headBuf), {
             executionProviders: [
                 "wasm"
-            ]
+            ],
+            logSeverityLevel: 3
         });
     }
     return {

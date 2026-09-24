@@ -16,3 +16,5 @@ Changes from upstream:
   (`feedHead` accepts a tensor). About 3x faster per post.
 - `providers.js`: the ONNX Runtime Web module can be overridden with `globalThis.LAYA_ORT_URL` (used by the
   Chrome extension, which bundles its own copy).
+- `providers.js`: browser sessions log errors only (`logSeverityLevel: 3`); ONNX Runtime's per-session
+  warnings otherwise fill Chrome's extension error page.

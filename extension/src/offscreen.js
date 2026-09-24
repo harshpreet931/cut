@@ -2,6 +2,14 @@
 // overlapping runs. The listener is registered before anything is awaited, so the first message
 // from the background can't arrive while nobody is listening.
 globalThis.LAYA_ORT_URL = chrome.runtime.getURL("ort/ort.webgpu.bundle.min.mjs");
+
+// Chrome lists anything an extension logs as an error on chrome://extensions. This checkpoint's known,
+// harmless calibration warning (cut ranks by probability) would otherwise sit there looking like a bug.
+const warn = console.warn;
+console.warn = (...args) => {
+  if (String(args[0]).startsWith("laya: this checkpoint ships invalid temperatures")) return;
+  warn(...args);
+};
 const layaReady = import("./lib/browser-laya.js");
 
 let agent = null;

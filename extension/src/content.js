@@ -4,11 +4,15 @@
 (async () => {
   const SITES = [
     {
+      name: "LinkedIn",
       host: /(^|\.)linkedin\.com$/,
-      post: "div.feed-shared-update-v2, div[data-urn^='urn:li:activity'], div[data-id^='urn:li:activity']",
       text: ".update-components-text, .feed-shared-inline-show-more-text, .feed-shared-text",
+      // LinkedIn renames its classes; post text still comes in runs marked with a writing direction.
+      fallback: true,
+      exclude: "header, nav, aside, form, [role='dialog'], [contenteditable], [class*='comment'], [data-view-name*='comment'], [class*='msg-'], [class*='messaging']",
     },
     {
+      name: "X",
       host: /(^|\.)(x|twitter)\.com$/,
       post: "article[data-testid='tweet']",
       text: "div[data-testid='tweetText']",
@@ -37,7 +41,7 @@
   let mode = (await chrome.storage.sync.get({ mode: "cut" })).mode; // off | mark | cut
   let modelMissing = false;
   const states = new Map(); // text element -> state
-  const byPost = new WeakMap(); // post container -> state; the IntersectionObserver watches posts
+  const byTarget = new WeakMap(); // what the IntersectionObserver watches -> state: the text, then our layer
   const cache = new Map(); // post text -> Laya's reading
 
   loadHandFont();
@@ -52,16 +56,34 @@
     return oneSentencePerLine(raw);
   }
 
+  // Post text boxes: the known class names first, then (on LinkedIn) any long run of text with a
+  // writing direction that isn't page chrome or a comment. Only the outermost box of each post counts.
+  function textBoxes() {
+    const found = new Set(document.querySelectorAll(site.text));
+    if (site.fallback) {
+      for (const el of document.querySelectorAll("[dir='ltr'], [dir='auto'], [dir='rtl']")) {
+        if (el.closest("cut-post") || (site.exclude && el.closest(site.exclude))) continue;
+        if (el.querySelector("div, p, ul, ol, li, button, section, article, h1, h2, h3, input, textarea, video")) continue;
+        if ((el.textContent || "").length < 120) continue;
+        found.add(el);
+      }
+    }
+    return [...found].filter((el) => {
+      for (let a = el.parentElement; a; a = a.parentElement) if (found.has(a)) return false;
+      return true;
+    });
+  }
+
   function scan() {
     // Feeds are endless: forget posts the site has removed, so their nodes can be freed.
     for (const [el, s] of states) {
       if (el.isConnected) continue;
-      if (s.post) io.unobserve(s.post);
+      io.unobserve(el);
+      if (s.host) io.unobserve(s.host);
       states.delete(el);
     }
-    for (const el of document.querySelectorAll(site.text)) {
-      if (el.parentElement?.closest(site.text)) continue; // take the outermost text box (it holds "…more" too)
-      const post = el.closest(site.post);
+    for (const el of textBoxes()) {
+      const post = site.post ? el.closest(site.post) : el.parentElement;
       if (!post || (site.skip && post.querySelector(site.skip))) continue;
       const sig = el.textContent;
       const old = states.get(el);
@@ -76,15 +98,15 @@
       }
       const s = { el, post, sig, lines, real, probs: null, status: "new", visible: false, host: null, cut: false, stet: false, dismissed: false };
       states.set(el, s);
-      byPost.set(post, s);
-      io.observe(post);
+      byTarget.set(el, s);
+      io.observe(el);
     }
   }
 
   const io = new IntersectionObserver(
     (entries) => {
       for (const e of entries) {
-        const s = byPost.get(e.target);
+        const s = byTarget.get(e.target);
         if (!s) continue;
         s.visible = e.isIntersecting;
         if (!s.visible || mode === "off" || s.dismissed) continue;
@@ -157,6 +179,10 @@
     s.hiddenDisplay = s.el.style.display;
     s.el.style.display = "none";
     s.el.before(s.host);
+    // The text is hidden now, so watch our layer for visibility instead.
+    io.unobserve(s.el);
+    byTarget.set(s.host, s);
+    io.observe(s.host);
     s.host.classList.toggle("dark", isDark());
     new ResizeObserver(() => s.marked && drawMarks(s, false)).observe(s.box);
     render(s);
@@ -164,9 +190,11 @@
 
   function unmount(s) {
     if (!s.host) return;
+    io.unobserve(s.host);
     s.host.remove();
     s.host = null;
     s.el.style.display = s.hiddenDisplay ?? "";
+    if (!s.dismissed) io.observe(s.el); // e.g. switched off: watch the text again for when it's back on
   }
 
   function planFor(s) {
@@ -378,6 +406,18 @@
       // falls back to the system's cursive font
     }
   }
+
+  // What the popup shows under "This page".
+  chrome.runtime.onMessage.addListener((msg, _sender, send) => {
+    if (msg.type !== "tab-status") return;
+    const all = [...states.values()];
+    send({
+      site: site.name,
+      long: all.filter((s) => !s.skip).length,
+      cut: all.filter((s) => s.cut).length,
+      reading: all.filter((s) => s.status === "judging" || s.status === "queued").length,
+    });
+  });
 
   // ---------- settings ----------
 

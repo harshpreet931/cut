@@ -53,3 +53,18 @@ if (stats?.posts) {
 }
 
 refresh();
+
+// What the extension sees on the tab you opened the popup from.
+if (!document.body.classList.contains("page")) {
+  const pageEl = $("#page");
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  try {
+    const s = await chrome.tabs.sendMessage(tab.id, { type: "tab-status" });
+    pageEl.textContent = s.long
+      ? `This page: ${s.long} long ${s.long === 1 ? "post" : "posts"} found on ${s.site}, ${s.cut} cut${s.reading ? `, ${s.reading} being read` : ""}.`
+      : `This page: cut. is running on ${s.site} but hasn’t found a long post yet. Scroll the feed; posts under 30 words are left alone.`;
+  } catch {
+    pageEl.textContent = "This page: cut. isn’t running here. It works on linkedin.com and x.com; if you’re on one of those, reload the tab.";
+  }
+  pageEl.hidden = false;
+}
